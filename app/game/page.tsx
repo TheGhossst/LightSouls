@@ -304,20 +304,12 @@ const LightsoulsPage = () => {
             {!isWriting && (
               <div className="space-y-4">
                 {shuffledChoices.map((choice, idx) => (
-                  <div key={`${idx}div`}>
-                    <button
-                      key={idx}
-                      onClick={() => handleChoice(choice)}
-                      disabled={!!selectedChoice}
-                      className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
-                        choice
-                      )}`}
-                      aria-label={`Choose action: ${choice.text}`}
-                      role="radio"
-                      aria-checked={selectedChoice === choice}
-                    >
-                      {choice.text}
-                    </button>
+                  <div
+                    key={`${idx}div`}
+                    className={`flex flex-row rounded-lg transition border ${getChoiceButtonStyle(
+                      choice
+                    )}`}
+                  >
                     <SpeechButton
                       text={choice.text}
                       speechState={speechState}
@@ -327,6 +319,17 @@ const LightsoulsPage = () => {
                       onResume={handleSpeechResume}
                       onCancel={handleSpeechCancel}
                     />
+                    <button
+                      key={idx}
+                      onClick={() => handleChoice(choice)}
+                      disabled={!!selectedChoice}
+                      className="w-full px-4 py-3 text-left"
+                      aria-label={`Choose action: ${choice.text}`}
+                      role="radio"
+                      aria-checked={selectedChoice === choice}
+                    >
+                      {choice.text}
+                    </button>
                   </div>
                 ))}
               </div>

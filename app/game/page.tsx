@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import GameHeader from "./components/GameHeader";
 import GameLoading from "./components/GameLoading";
 import SpeechButton from "./components/SpeechButton";
+import TypewriterText from "./components/TypewriterText";
 
 interface Choice {
   text: string;
@@ -56,6 +57,7 @@ const LightsoulsPage = () => {
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
     null
   );
+  const [isWriting, setIsWriting] = useState(false);
 
   const fetchGameData = useCallback(async () => {
     setLoading(true);
@@ -241,9 +243,13 @@ const LightsoulsPage = () => {
             <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8">
               <div className="mb-6">
                 <h2 className="text-xl font-mono text-white mb-4">Begin</h2>
-                <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
-                  {gameData.backstory}
-                </p>
+                <TypewriterText
+                  text={gameData.backstory}
+                  onStart={() => setIsWriting(true)}
+                  onDone={() => setIsWriting(false)}
+                  className="text-zinc-300 leading-relaxed text-base italic sm:text-lg"
+                  speed={20}
+                />
                 <SpeechButton
                   text={gameData.backstory}
                   speechState={speechState}
@@ -254,12 +260,14 @@ const LightsoulsPage = () => {
                   onCancel={handleSpeechCancel}
                 />
               </div>
-              <button
-                onClick={handleStartJourney}
-                className="w-full sm:w-auto px-6 py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
-              >
-                Start Journey
-              </button>
+              {!isWriting && (
+                <button
+                  onClick={handleStartJourney}
+                  className="w-full sm:w-auto px-6 py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
+                >
+                  Start Journey
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -267,9 +275,13 @@ const LightsoulsPage = () => {
         {started && roundData && !gameOver && !loading && (
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
-              <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
-                {roundData.story}
-              </p>
+              <TypewriterText
+                text={roundData.story}
+                onStart={() => setIsWriting(true)}
+                onDone={() => setIsWriting(false)}
+                className="text-zinc-300 leading-relaxed text-base italic sm:text-lg"
+                speed={20}
+              />
               <SpeechButton
                 text={roundData.story}
                 speechState={speechState}
@@ -281,31 +293,33 @@ const LightsoulsPage = () => {
               />
             </div>
 
-            <div className="space-y-4">
-              {shuffledChoices.map((choice, idx) => (
-                <div key={`${idx}div`}>
-                  <button
-                    key={idx}
-                    onClick={() => handleChoice(choice)}
-                    disabled={!!selectedChoice}
-                    className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
-                      choice
-                    )}`}
-                  >
-                    {choice.text}
-                  </button>
-                  <SpeechButton
-                    text={choice.text}
-                    speechState={speechState}
-                    currentText={currentText}
-                    onStart={handleSpeechStart}
-                    onPause={handleSpeechPause}
-                    onResume={handleSpeechResume}
-                    onCancel={handleSpeechCancel}
-                  />
-                </div>
-              ))}
-            </div>
+            {!isWriting && (
+              <div className="space-y-4">
+                {shuffledChoices.map((choice, idx) => (
+                  <div key={`${idx}div`}>
+                    <button
+                      key={idx}
+                      onClick={() => handleChoice(choice)}
+                      disabled={!!selectedChoice}
+                      className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
+                        choice
+                      )}`}
+                    >
+                      {choice.text}
+                    </button>
+                    <SpeechButton
+                      text={choice.text}
+                      speechState={speechState}
+                      currentText={currentText}
+                      onStart={handleSpeechStart}
+                      onPause={handleSpeechPause}
+                      onResume={handleSpeechResume}
+                      onCancel={handleSpeechCancel}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
             {selectedChoice && selectedReason && (
               <div

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import TypewriterText from "../game/components/TypewriterText";
 import SpeechButton from "../game/components/SpeechButton";
@@ -27,6 +27,8 @@ const BossPage = () => {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [victory, setVictory] = useState(false);
+  const [showEndStory, setShowEndStory] = useState(false);
+  const [endStoryComplete, setEndStoryComplete] = useState(false);
   const [speechState, setSpeechState] = useState<
     "idle" | "generating" | "playing" | "paused"
   >("idle");
@@ -37,6 +39,8 @@ const BossPage = () => {
   const [isWriting, setIsWriting] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [specialCooldown, setSpecialCooldown] = useState(0);
+  const [bossEnraged, setBossEnraged] = useState(false);
+  const [enrageTriggered, setEnrageTriggered] = useState(false);
 
   const rollDice = (sides: number) => Math.floor(Math.random() * sides) + 1;
 
@@ -68,6 +72,33 @@ const BossPage = () => {
     "A sudden chill runs down your spine.",
   ];
 
+  const enrageStories = [
+    "The boss's wounds begin to glow with dark energy!",
+    "Blood drips from the boss's wounds, but its eyes burn brighter!",
+    "The boss lets out a bone-chilling roar of fury!",
+    "Dark flames begin to surround the enraged boss!",
+    "The boss's breathing becomes heavy and labored, but more dangerous!",
+    "Cracks appear in the arena floor from the boss's increased power!",
+    "The boss's movements become more erratic and violent!",
+    "A red aura emanates from the wounded boss!",
+    "The boss's attacks carry the weight of pure rage!",
+    "You can feel the boss's fury radiating through the air!",
+  ];
+
+  const victoryStory = `With a final blow, the boss falls. You stand victorious! The battle is won.`;
+
+  const defeatStory = "YOU DIED";
+
+  useEffect(() => {
+    if (gameOver && !showEndStory) {
+      const timer = setTimeout(() => {
+        setShowEndStory(true);
+        setCurrentStory(victory ? victoryStory : defeatStory);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameOver, showEndStory, victory, victoryStory, defeatStory]);
+
   const handleAction = (choice: Choice) => {
     setSelectedChoice(choice);
     choice.action();
@@ -75,7 +106,19 @@ const BossPage = () => {
 
   const processTurn = useCallback(
     (action: string) => {
-      const storyIntro = stories[turn % stories.length] + " ";
+      const shouldEnrage = bossHealth <= 75 && !enrageTriggered;
+
+      let storyIntro = "";
+      if (shouldEnrage) {
+        storyIntro = enrageStories[turn % enrageStories.length] + " ";
+        setBossEnraged(true);
+        setEnrageTriggered(true);
+      } else if (bossEnraged) {
+        storyIntro = enrageStories[turn % enrageStories.length] + " ";
+      } else {
+        storyIntro = stories[turn % stories.length] + " ";
+      }
+
       let outcome = "";
       let playerDamage = 0;
       let bossDamage = 0;
@@ -87,9 +130,13 @@ const BossPage = () => {
           playerDamage = attackRoll > 10 ? rollDice(15) + 5 : rollDice(10);
           outcome = `You attack! Roll: ${attackRoll}. You deal ${playerDamage} damage.`;
           const bossCounter = rollDice(10);
-          bossDamage = bossCounter > 5 ? rollDice(10) : 0;
-          if (bossDamage > 0)
-            outcome += ` Boss counters for ${bossDamage} damage.`;
+          const baseBossDamage = bossCounter > 5 ? rollDice(10) : 0;
+          bossDamage = bossEnraged ? baseBossDamage * 2 : baseBossDamage;
+          if (bossDamage > 0) {
+            outcome += bossEnraged
+              ? ` Boss counters with ENRAGED fury for ${bossDamage} damage!`
+              : ` Boss counters for ${bossDamage} damage.`;
+          }
           break;
         case "Dodge":
           const dodgeRoll = rollDice(20);
@@ -97,22 +144,32 @@ const BossPage = () => {
             dodgeRoll > 12
               ? "You successfully dodge the boss's attack! No damage taken."
               : "Dodge failed. ";
-          bossDamage = dodgeRoll > 12 ? 0 : rollDice(15);
-          if (bossDamage > 0)
-            outcome += `Boss hits you for ${bossDamage} damage.`;
+          const baseDodgeDamage = dodgeRoll > 12 ? 0 : rollDice(15);
+          bossDamage = bossEnraged ? baseDodgeDamage * 2 : baseDodgeDamage;
+          if (bossDamage > 0) {
+            outcome += bossEnraged
+              ? `Enraged boss hits you for ${bossDamage} damage!`
+              : `Boss hits you for ${bossDamage} damage.`;
+          }
           break;
         case "Heal":
           heal = rollDice(10) + 10;
           outcome = `You heal for ${heal} health.`;
-          bossDamage = rollDice(8);
-          outcome += ` Boss attacks for ${bossDamage} damage.`;
+          const baseHealDamage = rollDice(8);
+          bossDamage = bossEnraged ? baseHealDamage * 2 : baseHealDamage;
+          outcome += bossEnraged
+            ? ` Enraged boss attacks for ${bossDamage} damage!`
+            : ` Boss attacks for ${bossDamage} damage.`;
           break;
         case "Special Attack":
           const specialRoll = rollDice(20);
           playerDamage = specialRoll > 8 ? rollDice(25) + 10 : rollDice(15);
           outcome = `You unleash a special attack! Roll: ${specialRoll}. You deal ${playerDamage} damage.`;
-          bossDamage = rollDice(5);
-          outcome += ` Boss retaliates weakly for ${bossDamage} damage.`;
+          const baseSpecialDamage = rollDice(5);
+          bossDamage = bossEnraged ? baseSpecialDamage * 2 : baseSpecialDamage;
+          outcome += bossEnraged
+            ? ` Enraged boss retaliates for ${bossDamage} damage!`
+            : ` Boss retaliates weakly for ${bossDamage} damage.`;
           break;
         default:
           outcome = "Invalid action.";
@@ -126,7 +183,15 @@ const BossPage = () => {
       setPlayerHealth(newPlayerHealth);
       setBossHealth(newBossHealth);
 
-      outcome = storyIntro + outcome;
+      if (shouldEnrage) {
+        outcome =
+          "💀 THE BOSS BECOMES ENRAGED! DOUBLE DAMAGE! 💀 " +
+          storyIntro +
+          outcome;
+      } else {
+        outcome = storyIntro + outcome;
+      }
+
       outcome += ` Your health: ${newPlayerHealth}, Boss health: ${newBossHealth}.`;
       setCurrentStory(outcome);
       setHistory([...history, { action, outcome }]);
@@ -144,7 +209,15 @@ const BossPage = () => {
         );
       }
     },
-    [playerHealth, bossHealth, history, turn, specialCooldown]
+    [
+      playerHealth,
+      bossHealth,
+      history,
+      turn,
+      specialCooldown,
+      bossEnraged,
+      enrageTriggered,
+    ]
   );
 
   const choices = useMemo(
@@ -248,7 +321,7 @@ const BossPage = () => {
         </div>
 
         <div className="flex-1 flex flex-col min-h-0">
-          {!gameOver ? (
+          {!gameOver || !showEndStory ? (
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 min-h-0 mb-4 sm:mb-6">
                 <div
@@ -303,8 +376,12 @@ const BossPage = () => {
 
                     <div>
                       <div className="flex justify-between mb-1">
-                        <span className="text-xs sm:text-sm text-zinc-400">
-                          Boss Health
+                        <span
+                          className={`text-xs sm:text-sm ${
+                            bossEnraged ? "text-red-400" : "text-zinc-400"
+                          }`}
+                        >
+                          Boss Health {bossEnraged ? "(ENRAGED)" : ""}
                         </span>
                         <span
                           className="text-xs sm:text-sm text-white"
@@ -322,8 +399,15 @@ const BossPage = () => {
                         aria-label="Boss health bar"
                       >
                         <div
-                          className="h-full bg-red-500 rounded-sm transition-all duration-300"
-                          style={{ width: `${(bossHealth / 150) * 100}%` }}
+                          className={`h-full rounded-sm transition-all duration-300 ${
+                            bossEnraged ? "bg-red-600" : "bg-red-500"
+                          }`}
+                          style={{
+                            width: `${(bossHealth / 150) * 100}%`,
+                            boxShadow: bossEnraged
+                              ? "0 0 10px rgba(255, 0, 0, 0.5)"
+                              : "none",
+                          }}
                         />
                       </div>
                     </div>
@@ -376,32 +460,114 @@ const BossPage = () => {
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div
-                className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8 max-w-sm mx-auto w-full text-center"
-                role="region"
-                aria-label="Game over message"
-              >
-                <h2 className="text-2xl sm:text-3xl font-mono font-bold mb-4 sm:mb-6">
-                  {victory ? "Victory!" : "Defeat!"}
-                </h2>
-                <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base">
-                  {victory
-                    ? "You defeated the boss!"
-                    : "The boss was too strong."}
-                </p>
-                <button
-                  onClick={resetGame}
-                  className="px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded text-sm sm:text-base lg:text-lg"
-                  aria-label="Restart the game"
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 min-h-0 mb-6">
+                <div
+                  className={`${
+                    victory
+                      ? "bg-zinc-900 border border-zinc-700"
+                      : "bg-red-950/20 border border-red-900/50"
+                  } rounded-lg p-6 h-full flex flex-col`}
+                  role="region"
+                  aria-label="End story"
                 >
-                  Play Again
-                </button>
+                  <div
+                    className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center"
+                    aria-live="polite"
+                  >
+                    {victory ? (
+                      <TypewriterText
+                        text={currentStory}
+                        onStart={() => setIsWriting(true)}
+                        onDone={() => {
+                          setIsWriting(false);
+                          setEndStoryComplete(true);
+                        }}
+                        className="text-zinc-300 leading-relaxed text-sm sm:text-base italic text-center max-w-2xl"
+                        speed={30}
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <div
+                          className="text-6xl sm:text-8xl lg:text-9xl font-bold text-red-500 mb-4 tracking-wider"
+                          style={{
+                            fontFamily: "serif",
+                            textShadow:
+                              "4px 4px 8px rgba(0,0,0,0.8), 0 0 20px rgba(255,0,0,0.3)",
+                            animation: "fadeInPulse 2s ease-out forwards",
+                          }}
+                        >
+                          YOU DIED
+                        </div>
+                        <div className="text-zinc-400 text-lg sm:text-xl italic">
+                          The darkness claims another soul...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {victory && (
+                    <div className="flex-shrink-0 mt-4">
+                      <SpeechButton
+                        text={currentStory}
+                        speechState={speechState}
+                        currentText={currentText}
+                        onStart={handleSpeechStart}
+                        onPause={handleSpeechPause}
+                        onResume={handleSpeechResume}
+                        onCancel={handleSpeechCancel}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {(endStoryComplete || !victory) && (
+                <div className="flex-shrink-0">
+                  <div
+                    className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8 text-center"
+                    role="region"
+                    aria-label="Game over options"
+                  >
+                    <h2 className="text-2xl sm:text-3xl font-mono font-bold mb-4 sm:mb-6">
+                      {victory ? "Victory Achieved!" : "Game Over"}
+                    </h2>
+                    <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base">
+                      {victory
+                        ? "Your legend will be remembered forever."
+                        : "Will you rise from the ashes?"}
+                    </p>
+                    <button
+                      onClick={resetGame}
+                      className="px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded text-sm sm:text-base lg:text-lg"
+                      aria-label="Restart the game"
+                    >
+                      {victory ? "Begin New Quest" : "Try Again"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeInPulse {
+          0% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 };

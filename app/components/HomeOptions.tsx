@@ -2,9 +2,22 @@
 
 import { Play } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function HomeOptions() {
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        linkRef.current?.click(); // Simulates a real click
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <>
       <style jsx>{`
@@ -23,18 +36,16 @@ export default function HomeOptions() {
       `}</style>
 
       <div className="relative mx-auto group text-center">
-        {/* Background blur on hover */}
-
-        {/* Wider button */}
-        <div className="relative flex items-center justify-between p-8 w-{80%}">
+        <div className="relative flex items-center justify-between p-8">
           <Link
+            ref={linkRef}
             href="/game"
             className="cursor-pointer group/tag transition-all duration-300 ease-out hover:scale-105"
             aria-label="Start new game"
             role="button"
           >
             <div
-              className="flex items-center px-12 py-3 rounded-xl bg-pulse"
+              className="flex items-center px-12 py-3 rounded-xl bg-pulse group-hover:bg-white/20"
               aria-hidden="true"
             >
               <h2 className="text-xl font-medium text-gray-300 group-hover/tag:text-white transition-colors duration-300">

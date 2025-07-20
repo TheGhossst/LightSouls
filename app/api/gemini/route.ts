@@ -15,7 +15,8 @@ Only ONE choice should be correct. Randomize which one is correct each time.
 Provide an effect for both outcomes that expands the world or deepens the mystery.
 
 Generate the entire game in one go: backstory and all 5 rounds.
-The story should be coherent, assuming the player always chooses the correct choice to progress.
+The story should be coherent, assuming the player always chooses the correct choice to progress. For the final round (Round 5), the story and the effect of the correct choice should build tension and act as a prelude, indicating that a powerful boss is just ahead.
+
 Start with a BACKSTORY to introduce the setting. Keep it mysterious, poetic, and less than 5 sentences.
 
 Then, for each round 1 to 5, generate the story and choices.
@@ -23,20 +24,20 @@ Then, for each round 1 to 5, generate the story and choices.
 Now return ONLY a JSON object in this format:
 
 {
-  "backstory": "string",
-  "round": [
-    {
-      "roundno": 1,
-      "story": "string",
-      "choice1": "string",
-      "choice1effect": "string",
-      "choice1isCorrect": boolean,
-      "choice2": "string",
-      "choice2effect": "string",
-      "choice2isCorrect": boolean
-    },
-    ... (for rounds 2 to 5)
-  ]
+  "backstory": "string",
+  "round": [
+    {
+      "roundno": 1,
+      "story": "string",
+      "choice1": "string",
+      "choice1effect": "string",
+      "choice1isCorrect": boolean,
+      "choice2": "string",
+      "choice2effect": "string",
+      "choice2isCorrect": boolean
+    },
+    ... // for rounds 2 to 5
+  ]
 }
 `;
 

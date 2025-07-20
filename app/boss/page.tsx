@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import GameHeader from "../game/components/GameHeader";
 import TypewriterText from "../game/components/TypewriterText";
 import SpeechButton from "../game/components/SpeechButton";
+import BossHeader from "./components/BossHeader";
 
 interface Choice {
   text: string;
@@ -108,12 +108,6 @@ const BossPage = () => {
           outcome += ` Boss attacks for ${bossDamage} damage.`;
           break;
         case "Special Attack":
-          if (specialCooldown > 0) {
-            outcome = "Special Attack is on cooldown! You miss your turn. ";
-            bossDamage = rollDice(12);
-            outcome += `Boss attacks for ${bossDamage} damage.`;
-            break;
-          }
           const specialRoll = rollDice(20);
           playerDamage = specialRoll > 8 ? rollDice(25) + 10 : rollDice(15);
           outcome = `You unleash a special attack! Roll: ${specialRoll}. You deal ${playerDamage} damage.`;
@@ -234,7 +228,7 @@ const BossPage = () => {
     <div className="h-screen bg-black text-white font-sans overflow-hidden flex flex-col">
       <div className="flex-1 max-w-4xl mx-auto w-full px-3 py-4 sm:px-4 sm:py-6 flex flex-col">
         <div className="flex-shrink-0">
-          <GameHeader />
+          <BossHeader />
         </div>
         <div className="flex-shrink-0 mb-4 sm:mb-6">
           <div

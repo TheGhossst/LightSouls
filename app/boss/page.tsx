@@ -490,15 +490,15 @@ const BossPage = () => {
       <div className="h-screen bg-black text-white font-mono overflow-hidden flex items-center justify-center">
         <div className="max-w-4xl mx-auto p-8 text-center">
           <div
-            className={`bg-gray-900 border-2 rounded-lg p-8 shadow-2xl ${
-              victory ? "border-green-600" : "border-red-600"
+            className={`bg-black p-8 ${
+              victory ? "border-white" : "border-zinc-500"
             }`}
           >
             {/* Victory/Defeat Icon */}
             <div className="mb-8">
               <h1
                 className={`text-4xl sm:text-6xl font-bold mb-6 ${
-                  victory ? "text-green-400" : "text-red-400"
+                  victory ? "text-white" : "text-zinc-400"
                 }`}
               >
                 {victory ? "VICTORY!" : "DEFEAT!"}
@@ -506,30 +506,30 @@ const BossPage = () => {
             </div>
 
             {/* Battle Summary */}
-            <div className="mb-8 p-4 bg-gray-800 border border-gray-600 rounded-lg">
-              <h2 className="text-xl font-bold mb-4 text-gray-300">
+            <div className="mb-8 p-4 bg-black">
+              <h2 className="text-xl font-bold mb-4 text-zinc-300">
                 Battle Summary
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div className="text-center">
-                  <div className="text-gray-400">Turns Survived</div>
+                  <div className="text-zinc-400">Turns Survived</div>
                   <div className="text-2xl font-bold text-white">{turn}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-gray-400">Final Health</div>
+                  <div className="text-zinc-400">Final Health</div>
                   <div
                     className={`text-2xl font-bold ${
-                      playerHealth > 0 ? "text-green-400" : "text-red-400"
+                      playerHealth > 0 ? "text-white" : "text-zinc-500"
                     }`}
                   >
                     {playerHealth}/100
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-gray-400">Boss Health</div>
+                  <div className="text-zinc-400">Boss Health</div>
                   <div
                     className={`text-2xl font-bold ${
-                      bossHealth > 0 ? "text-red-400" : "text-green-400"
+                      bossHealth > 0 ? "text-zinc-500" : "text-white"
                     }`}
                   >
                     {bossHealth}/150
@@ -547,7 +547,7 @@ const BossPage = () => {
                   setIsWriting(false);
                   setVictoryDefeatStoryComplete(true);
                 }}
-                className="text-lg sm:text-xl leading-relaxed text-gray-300 italic"
+                className="text-lg sm:text-xl leading-relaxed text-zinc-300 italic"
                 speed={reducedMotion ? 5 : 30}
               />
             </div>
@@ -575,8 +575,8 @@ const BossPage = () => {
                     !reducedMotion ? "hover:scale-105 active:scale-95" : ""
                   } ${
                     victory
-                      ? "bg-gray-800 text-green-400 border-green-400 hover:bg-gray-700 focus:ring-green-500"
-                      : "bg-gray-800 text-red-400 border-red-400 hover:bg-gray-700 focus:ring-red-500"
+                      ? "bg-black text-white border-white hover:bg-zinc-900 focus:ring-zinc-500"
+                      : "bg-black text-zinc-400 border-zinc-500 hover:bg-zinc-900 focus:ring-zinc-600"
                   }`}
                   aria-label={
                     victory
@@ -587,7 +587,7 @@ const BossPage = () => {
                   {victory ? "NEW QUEST" : "TRY AGAIN"}
                 </button>
 
-                <div className="text-gray-500 text-sm mt-4">
+                <div className="text-zinc-500 text-sm mt-4">
                   Press Enter or Space to continue
                 </div>
               </div>
@@ -623,14 +623,14 @@ const BossPage = () => {
                   setIsWriting(false);
                   setIntroComplete(true);
                 }}
-                className="text-lg sm:text-xl leading-relaxed text-gray-300 italic"
+                className="text-lg sm:text-xl leading-relaxed text-zinc-300 italic"
                 speed={30}
               />
             </div>
 
             {introComplete && (
               <div className="space-y-6">
-                <div className="text-red-400 font-bold text-xl sm:text-2xl mb-6">
+                <div className="text-white font-bold text-xl sm:text-2xl mb-6">
                   Do you dare to continue?
                 </div>
                 {/* Speech Button for Intro */}
@@ -648,20 +648,20 @@ const BossPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
                   <button
                     onClick={startBattle}
-                    className="px-6 py-4 bg-gray-800 text-red-400 border-2 border-red-600 rounded-lg font-bold text-base hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="px-6 py-4 bg-zinc-900 text-white border-2 border-zinc-700 rounded-lg font-bold text-base hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-500"
                     aria-label="Enter the battle arena and face the boss courageously"
                   >
                     FACE THE DARKNESS
                   </button>
                   <button
                     onClick={startBattle}
-                    className="px-6 py-4 bg-gray-800 text-gray-300 border-2 border-gray-600 rounded-lg font-bold text-base hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="px-6 py-4 bg-zinc-900 text-zinc-300 border-2 border-zinc-600 rounded-lg font-bold text-base hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-500"
                     aria-label="Proceed with caution into the battle"
                   >
                     PROCEED CAREFULLY
                   </button>
                 </div>
-                <div className="text-gray-500 text-sm mt-4">
+                <div className="text-zinc-500 text-sm mt-4">
                   Press 1, 2, or Enter to continue
                 </div>
               </div>
@@ -671,7 +671,6 @@ const BossPage = () => {
       </div>
     );
   }
-
   return (
     <div className="h-screen bg-black text-white font-mono overflow-hidden">
       <BackgroundMusicPlayer
@@ -682,7 +681,7 @@ const BossPage = () => {
       <div className="h-full flex flex-col lg:flex-row">
         <div className="flex-1 lg:flex-none lg:w-3/5 p-2 sm:p-4 flex flex-col">
           <div className="mb-2 sm:mb-4">
-            <div className="bg-gray-900 border-2 border-gray-600 rounded-lg p-2 text-center">
+            <div className="bg-black border-2 border-zinc-600 rounded-lg p-2 text-center">
               <span
                 className="text-white font-bold text-base sm:text-lg"
                 aria-live="polite"
@@ -695,7 +694,7 @@ const BossPage = () => {
 
           <div className="flex-1 relative mb-2 sm:mb-4">
             <div
-              className="h-full bg-gray-800 border-2 border-gray-600 rounded-lg relative overflow-hidden"
+              className="h-full bg-black border-2 border-zinc-600 rounded-lg relative overflow-hidden"
               role="img"
               aria-label={`Battle arena showing player versus ${bossName}`}
             >
@@ -706,12 +705,12 @@ const BossPage = () => {
                 className="absolute inset-0 w-full h-full object-cover"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-b from-gray-700/20 to-gray-800/40" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40" />
 
               <div className="absolute bottom-4 left-4 w-2/5">
                 <div className="flex justify-center mb-2 sm:mb-4">
                   <div
-                    className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-transparent border-2 border-gray-500 rounded-lg flex items-center justify-center transform transition-all duration-300 ${
+                    className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-transparent border-2 border-zinc-500 rounded-lg flex items-center justify-center transform transition-all duration-300 ${
                       !reducedMotion ? "hover:scale-105" : ""
                     }`}
                     role="img"
@@ -726,14 +725,14 @@ const BossPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-gray-900 border border-gray-600 rounded-lg p-2">
+                <div className="bg-black border border-zinc-600 rounded-lg p-2">
                   <div className="text-white font-bold text-xs sm:text-sm mb-1">
                     PLAYER
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-xs">HP:</span>
+                    <span className="text-zinc-400 text-xs">HP:</span>
                     <div
-                      className="flex-1 h-2 bg-gray-700 border border-gray-500 rounded"
+                      className="flex-1 h-2 bg-zinc-800 border border-zinc-500 rounded"
                       role="progressbar"
                       aria-valuenow={playerHealth}
                       aria-valuemin={0}
@@ -763,7 +762,7 @@ const BossPage = () => {
               </div>
 
               <div className="absolute top-4 right-4 w-2/5">
-                <div className="bg-gray-900 border border-gray-600 rounded-lg p-2">
+                <div className="bg-black border border-zinc-600 rounded-lg p-2">
                   <div
                     className="text-white font-bold text-xs sm:text-sm mb-1 truncate"
                     title={bossName}
@@ -773,9 +772,9 @@ const BossPage = () => {
                       : bossName}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-xs">HP:</span>
+                    <span className="text-zinc-400 text-xs">HP:</span>
                     <div
-                      className="flex-1 h-2 bg-gray-700 border border-gray-500 rounded"
+                      className="flex-1 h-2 bg-zinc-800 border border-zinc-500 rounded"
                       role="progressbar"
                       aria-valuenow={bossHealth}
                       aria-valuemin={0}
@@ -811,7 +810,7 @@ const BossPage = () => {
                 </div>
                 <div className="flex justify-center mt-2 sm:mt-4">
                   <div
-                    className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-transparent border-2 border-gray-500 rounded-lg flex items-center justify-center transform transition-all duration-300 ${
+                    className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-transparent border-2 border-zinc-500 rounded-lg flex items-center justify-center transform transition-all duration-300 ${
                       !reducedMotion && bossEnraged
                         ? "animate-bounce border-red-500"
                         : !reducedMotion
@@ -856,16 +855,16 @@ const BossPage = () => {
                     key={idx}
                     onClick={() => handleAction(choice)}
                     disabled={choice.disabled || buttonsDisabled || isWriting}
-                    className={`p-2 sm:p-3 md:p-4 border-2 rounded-lg font-bold text-xs sm:text-sm md:text-base transition-all transform focus:outline-none focus:ring-2 focus:ring-gray-400 ${
+                    className={`p-2 sm:p-3 md:p-4 border-2 rounded-lg font-bold text-xs sm:text-sm md:text-base transition-all transform focus:outline-none focus:ring-2 focus:ring-zinc-400 ${
                       choice.disabled || buttonsDisabled || isWriting
-                        ? "bg-gray-700 text-gray-500 cursor-not-allowed opacity-50 border-gray-600"
-                        : `bg-gray-800 text-white hover:bg-gray-700 active:bg-gray-600 border-gray-600 hover:border-gray-500 ${
+                        ? "bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50 border-zinc-600"
+                        : `bg-black text-white hover:bg-zinc-900 active:bg-zinc-800 border-zinc-600 hover:border-zinc-500 ${
                             !reducedMotion
                               ? "hover:scale-105 active:scale-95"
                               : ""
                           } ${
                             focusedChoiceIndex === idx
-                              ? "ring-2 ring-gray-400"
+                              ? "ring-2 ring-zinc-400"
                               : ""
                           }`
                     }`}
@@ -882,8 +881,8 @@ const BossPage = () => {
         </div>
 
         <div className="flex-1 lg:flex-none lg:w-2/5 p-2 sm:p-4 flex flex-col">
-          <div className="h-64 sm:h-80 bg-gray-900 border-2 border-gray-600 rounded-lg overflow-hidden mb-2 sm:mb-4">
-            <div className="bg-gray-800 text-white p-2 sm:p-3 border-b-2 border-gray-600">
+          <div className="h-64 sm:h-80 bg-black border-2 border-zinc-600 rounded-lg overflow-hidden mb-2 sm:mb-4">
+            <div className="bg-zinc-800 text-white p-2 sm:p-3 border-b-2 border-zinc-600">
               <h1 className="text-base sm:text-lg font-bold text-center">
                 BATTLE LOG
               </h1>
@@ -910,7 +909,7 @@ const BossPage = () => {
                 </div>
               </div>
             </div>
-            <div className="border-t-2 border-gray-600 p-2 sm:p-3 bg-gray-800">
+            <div className="border-t-2 border-zinc-600 p-2 sm:p-3 bg-zinc-800">
               <div className="flex justify-center">
                 <SpeechButton
                   text={currentStory}
@@ -926,8 +925,8 @@ const BossPage = () => {
           </div>
 
           {/* Battle History - Fixed Scrolling */}
-          <div className="flex-1 bg-gray-900 border-2 border-gray-600 rounded-lg overflow-hidden flex flex-col">
-            <div className="bg-gray-800 text-white p-2 border-b-2 border-gray-600 flex-shrink-0">
+          <div className="flex-1 bg-black border-2 border-zinc-800 rounded-lg overflow-hidden flex flex-col">
+            <div className="bg-zinc-700 text-white p-2 border-b-2 border-zinc-600 flex-shrink-0">
               <h2 className="text-sm font-bold text-center">BATTLE HISTORY</h2>
             </div>
             <div
@@ -937,7 +936,7 @@ const BossPage = () => {
               style={{ maxHeight: "calc(100% - 40px)" }}
             >
               {history.length === 0 ? (
-                <div className="text-gray-500 text-xs text-center mt-4">
+                <div className="text-zinc-500 text-xs text-center mt-4">
                   No previous actions
                 </div>
               ) : (
@@ -945,9 +944,9 @@ const BossPage = () => {
                   {history.slice(-8).map((entry, idx) => (
                     <div
                       key={idx}
-                      className="text-xs bg-gray-800 border border-gray-700 rounded p-2"
+                      className="text-xs bg-zinc-900 border border-zinc-800 rounded p-2"
                     >
-                      <div className="text-gray-400 font-bold flex justify-between items-center">
+                      <div className="text-zinc-400 font-bold flex justify-between items-center">
                         <span className="flex items-center gap-1">
                           Turn {entry.turn}: {entry.action}
                           {entry.special && (
@@ -961,7 +960,7 @@ const BossPage = () => {
                         </span>
                         <span className="text-xs">{entry.timestamp}</span>
                       </div>
-                      <div className="text-gray-300 text-xs mt-1 flex justify-between">
+                      <div className="text-zinc-300 text-xs mt-1 flex justify-between">
                         <div className="flex gap-3">
                           {entry.playerDamage > 0 && (
                             <span

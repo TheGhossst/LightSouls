@@ -24,14 +24,6 @@ export default function HomeOptions() {
 
       <div className="relative mx-auto group text-center">
         {/* Background blur on hover */}
-        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-sm border border-gray-800/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out" />
-
-        {/* Large faded text in background */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover/tag:opacity-100 transition-all duration-500 ease-out">
-          <h1 className="text-6xl md:text-8xl font-light text-white/10 select-none whitespace-nowrap">
-            Play Game
-          </h1>
-        </div>
 
         {/* Wider button */}
         <div className="relative flex items-center justify-between p-8 w-{80%}">

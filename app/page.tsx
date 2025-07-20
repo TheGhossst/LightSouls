@@ -40,7 +40,7 @@ export default function HomePage() {
               onClick={handleClosePopup}
               className="w-full mt-2 px-4 py-2 bg-white/80 hover:bg-white text-black transition-colors rounded-md text-sm font-medium"
             >
-              Close
+              Proceed
             </button>
           </div>
         </div>

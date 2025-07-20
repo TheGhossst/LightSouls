@@ -37,6 +37,7 @@ export default function BossHeader() {
       <BackgroundMusicPlayer
         src="/bossbgm.mp3"
         className="absolute right-5 top-5"
+        volume={0.2}
       />
     </header>
   );

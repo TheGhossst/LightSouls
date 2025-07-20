@@ -34,11 +34,6 @@ export default function BossHeader() {
         </h1>
       </div>
       <div className="w-20 h-px bg-zinc-600 mx-auto"></div>
-      <BackgroundMusicPlayer
-        src="/bossbgm.mp3"
-        className="absolute right-5 top-5"
-        volume={0.2}
-      />
     </header>
   );
 }

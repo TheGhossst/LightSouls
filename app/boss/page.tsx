@@ -6,6 +6,7 @@ import TypewriterText from "../game/components/TypewriterText";
 import SpeechButton from "../game/components/SpeechButton";
 import Image from "next/image";
 import GameHeader from "../game/components/GameHeader";
+import BackgroundMusicPlayer from "../components/BackgroundMusicButton";
 
 interface Choice {
   text: string;
@@ -611,7 +612,7 @@ const BossPage = () => {
 
     return (
       <div className="h-screen bg-black text-white font-mono overflow-hidden flex flex-col items-center justify-center">
-        <GameHeader/>
+        <GameHeader />
         <div className="max-w-4xl mx-auto p-8 text-center">
           <div className="bg-black p-8 ">
             <div className="mb-8">
@@ -673,6 +674,11 @@ const BossPage = () => {
 
   return (
     <div className="h-screen bg-black text-white font-mono overflow-hidden">
+      <BackgroundMusicPlayer
+        src="/bossbgm.mp3"
+        className="absolute right-5 top-5"
+        volume={0.1}
+      />
       <div className="h-full flex flex-col lg:flex-row">
         <div className="flex-1 lg:flex-none lg:w-3/5 p-2 sm:p-4 flex flex-col">
           <div className="mb-2 sm:mb-4">

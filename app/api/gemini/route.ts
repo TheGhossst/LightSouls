@@ -1,32 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
-interface RoundHistory {
-  choice: string;
-  reason: string;
-}
-
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { history, round } = body;
-
-  if (!Array.isArray(history) || typeof round !== "number") {
-    return NextResponse.json(
-      { error: "Invalid request: Provide history (array) and round (number)" },
-      { status: 400 }
-    );
-  }
-
-  const context = history
-    .map((entry: RoundHistory, index: number) => {
-      return `Round ${index + 1}:\n- Choice made: "${entry.choice}"\n- Outcome: ${entry.reason}`;
-    })
-    .join("\n");
-
+export async function POST() {
   const prompt = `
 You are a game designer creating a dark fantasy, Souls-like RPG text adventure called "Lightsouls". The game lasts exactly 10 rounds. Each round presents the player with:
 - A short narrative story (2–3 sentences),
@@ -35,30 +12,31 @@ You are a game designer creating a dark fantasy, Souls-like RPG text adventure c
 The world is cursed, bleak, and rich in cryptic lore.
 
 Only ONE choice should be correct. Randomize which one is correct each time.
-Provide a reason for both outcomes that expands the world or deepens the mystery.
+Provide an effect for both outcomes that expands the world or deepens the mystery.
 
-The player is currently at Round ${round} of 10.
+Generate the entire game in one go: backstory and all 10 rounds.
+The story should be coherent, assuming the player always chooses the correct choice to progress.
+Start with a BACKSTORY to introduce the setting. Keep it mysterious, poetic, and less than 5 sentences.
 
-${
-  round === 1
-    ? `Start by generating a BACKSTORY to introduce the setting. Keep it mysterious, poetic, and less than 5 sentences.`
-    : `Past decisions:\n${context || "None yet."}`
-}
+Then, for each round 1 to 10, generate the story and choices.
 
 Now return ONLY a JSON object in this format:
 
 {
-  "story": "string (short story for this round)",
-  "choice1": {
-    "text": "string",
-    "isCorrect": boolean,
-    "reason": "string"
-  },
-  "choice2": {
-    "text": "string",
-    "isCorrect": boolean,
-    "reason": "string"
-  }
+  "backstory": "string",
+  "round": [
+    {
+      "roundno": 1,
+      "story": "string",
+      "choice1": "string",
+      "choice1effect": "string",
+      "choice1isCorrect": boolean,
+      "choice2": "string",
+      "choice2effect": "string",
+      "choice2isCorrect": boolean
+    },
+    ... (for rounds 2 to 10)
+  ]
 }
 `;
 
@@ -69,7 +47,7 @@ Now return ONLY a JSON object in this format:
     });
 
     const output = response.text;
-    if (!output) throw new Error("Failed!!")
+    if (!output) throw new Error("Failed!!");
     const start = output.indexOf("{");
     const end = output.lastIndexOf("}");
     const jsonText = output.slice(start, end + 1);

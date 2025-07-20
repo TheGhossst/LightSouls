@@ -10,6 +10,22 @@ interface Choice {
   reason: string;
 }
 
+interface Round {
+  roundno: number;
+  story: string;
+  choice1: string;
+  choice1effect: string;
+  choice1isCorrect: boolean;
+  choice2: string;
+  choice2effect: string;
+  choice2isCorrect: boolean;
+}
+
+interface GameData {
+  backstory: string;
+  round: Round[];
+}
+
 interface RoundData {
   story: string;
   choice1: Choice;
@@ -27,59 +43,59 @@ const LightsoulsPage = () => {
   const [roundData, setRoundData] = useState<RoundData | null>(null);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [backstory, setBackstory] = useState<string | null>(null);
+  const [gameData, setGameData] = useState<GameData | null>(null);
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [shuffledChoices, setShuffledChoices] = useState<Choice[]>([]);
 
-  const fetchBackstory = useCallback(async () => {
+  const fetchGameData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ history: [], round: 1 }),
       });
 
       const data = await res.json();
-      setBackstory(data.story);
+      setGameData(data);
     } catch (err) {
-      console.error("Failed to fetch backstory", err);
+      console.error("Failed to fetch game data", err);
     }
     setLoading(false);
   }, []);
 
-  const fetchGameRound = async (
-    currentRound: number,
-    currentHistory: HistoryEntry[]
-  ) => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ history: currentHistory, round: currentRound }),
-      });
-
-      const data = await res.json();
-      setRoundData(data);
-
-      const choices = [data.choice1, data.choice2];
-      setShuffledChoices(Math.random() > 0.5 ? choices : choices.reverse());
-
-      setSelectedReason(null);
-      setSelectedChoice(null);
-    } catch (err) {
-      console.error("Failed to fetch round", err);
+  const loadRound = (currentRound: number) => {
+    if (gameData) {
+      const current = gameData.round.find((r) => r.roundno === currentRound);
+      if (current) {
+        const choice1: Choice = {
+          text: current.choice1,
+          isCorrect: current.choice1isCorrect,
+          reason: current.choice1effect,
+        };
+        const choice2: Choice = {
+          text: current.choice2,
+          isCorrect: current.choice2isCorrect,
+          reason: current.choice2effect,
+        };
+        setRoundData({
+          story: current.story,
+          choice1,
+          choice2,
+        });
+        const choices = [choice1, choice2];
+        setShuffledChoices(Math.random() > 0.5 ? choices : choices.reverse());
+        setSelectedReason(null);
+        setSelectedChoice(null);
+      }
     }
-    setLoading(false);
   };
 
   const handleStartJourney = () => {
     setStarted(true);
     setRound(1);
-    fetchGameRound(1, []);
+    loadRound(1);
   };
 
   const handleChoice = (choice: Choice) => {
@@ -91,14 +107,14 @@ const LightsoulsPage = () => {
     setHistory(newHistory);
 
     if (!choice.isCorrect) {
-      setTimeout(() => setGameOver(true), 3000);
+      setTimeout(() => setGameOver(true), 5000);
     } else if (round >= 10) {
       setTimeout(() => setGameOver(true), 3000);
     } else {
       setTimeout(() => {
         const nextRound = round + 1;
         setRound(nextRound);
-        fetchGameRound(nextRound, newHistory);
+        loadRound(nextRound);
       }, 5000);
     }
   };
@@ -109,16 +125,16 @@ const LightsoulsPage = () => {
     setRoundData(null);
     setSelectedReason(null);
     setSelectedChoice(null);
-    setBackstory(null);
+    setGameData(null);
     setGameOver(false);
     setStarted(false);
     setShuffledChoices([]);
-    fetchBackstory();
+    fetchGameData();
   };
 
   useEffect(() => {
-    fetchBackstory();
-  }, [fetchBackstory]);
+    fetchGameData();
+  }, [fetchGameData]);
 
   const getChoiceButtonStyle = (choice: Choice) => {
     if (!selectedChoice) {
@@ -154,13 +170,13 @@ const LightsoulsPage = () => {
 
         {loading && <GameLoading />}
 
-        {!started && backstory && !roundData && !loading && (
+        {!started && gameData && !loading && (
           <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8">
               <div className="mb-6">
                 <h2 className="text-xl font-mono text-white mb-4">Begin</h2>
                 <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
-                  {backstory}
+                  {gameData.backstory}
                 </p>
               </div>
               <button
@@ -238,10 +254,10 @@ const LightsoulsPage = () => {
           <div className="max-w-xl mx-auto text-center">
             <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-8 sm:p-10">
               <h2 className="text-3xl sm:text-4xl font-mono font-bold mb-6">
-                {round >= 10 ? "Victory" : "Game Over"}
+                {history.length === 10 ? "Victory" : "Game Over"}
               </h2>
               <p className="text-zinc-400 mb-2">
-                {round >= 10
+                {history.length === 10
                   ? "You completed all 10 rounds!"
                   : `Journey ended at round ${round}`}
               </p>

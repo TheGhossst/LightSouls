@@ -13,54 +13,82 @@ const BackgroundMusicPlayer: React.FC<BackgroundMusicPlayerProps> = ({
   className,
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(true); // start muted
 
+  // Set volume once audio element is ready
   useEffect(() => {
-    const audio = new Audio(src);
-    audio.loop = true;
-    audio.volume = volume;
-    audio.muted = true;
-    audioRef.current = audio;
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
-    // Load and prepare the audio
-    audio.load();
+  // Enable sound on first user interaction (mousemove or click)
+  useEffect(() => {
+    const enableSound = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      audio.muted = false;
+      audio.volume = volume;
+      setIsMuted(false);
+
+      audio
+        .play()
+        .then(() => {
+          console.log("Autoplay started after interaction");
+        })
+        .catch((err) => {
+          console.warn("Autoplay failed:", err);
+        });
+
+      // Remove listeners after first interaction
+      document.removeEventListener("mousemove", enableSound);
+      document.removeEventListener("click", enableSound);
+    };
+
+    document.addEventListener("mousemove", enableSound);
+    document.addEventListener("click", enableSound);
 
     return () => {
-      audio.pause();
+      document.removeEventListener("mousemove", enableSound);
+      document.removeEventListener("click", enableSound);
     };
-  }, [src, volume]);
+  }, [volume]);
 
-  const toggleMute = async () => {
-    if (!audioRef.current) return;
-
+  const toggleMute = () => {
     const audio = audioRef.current;
-    audio.muted = !audio.muted;
-    setIsMuted(audio.muted);
+    if (!audio) return;
 
-    if (audio.paused) {
-      try {
-        await audio.play();
-      } catch (err) {
-        console.warn("Playback failed:", err);
-      }
-    }
+    const newMuted = !audio.muted;
+    audio.muted = newMuted;
+    setIsMuted(newMuted);
   };
 
   return (
-    <button
-      onClick={toggleMute}
-      className={`px-4 py-2 text-sm rounded bg-gray-900 text-white hover:bg-gray-700 ${className}`}
-      aria-label={`Background music - ${
-        isMuted ? "currently muted" : "currently playing"
-      }`}
-      aria-pressed={!isMuted}
-    >
-      {isMuted ? (
-        <VolumeOff color="grey" aria-hidden="true" />
-      ) : (
-        <Volume1 aria-hidden="true" />
-      )}
-    </button>
+    <>
+      {/* Hidden autoplaying audio tag */}
+      <audio
+        ref={audioRef}
+        src={src}
+        autoPlay
+        loop
+        style={{ display: "none" }}
+      />
+
+      {/* Mute toggle button */}
+      <button
+        onClick={toggleMute}
+        className={`px-4 py-2 text-sm rounded bg-gray-900 text-white hover:bg-gray-700 ${className}`}
+        aria-label={`Background music - ${isMuted ? "muted" : "playing"}`}
+        aria-pressed={!isMuted}
+      >
+        {isMuted ? (
+          <VolumeOff color="grey" aria-hidden="true" />
+        ) : (
+          <Volume1 aria-hidden="true" />
+        )}
+      </button>
+    </>
   );
 };
 

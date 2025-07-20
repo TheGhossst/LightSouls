@@ -270,6 +270,8 @@ const LightsoulsPage = () => {
                 <button
                   onClick={handleStartJourney}
                   className="w-full sm:w-auto px-6 py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
+                  aria-label="Begin your adventure"
+                  disabled={isWriting}
                 >
                   Start Journey
                 </button>
@@ -310,6 +312,9 @@ const LightsoulsPage = () => {
                       className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
                         choice
                       )}`}
+                      aria-label={`Choose action: ${choice.text}`}
+                      role="radio"
+                      aria-checked={selectedChoice === choice}
                     >
                       {choice.text}
                     </button>
@@ -374,6 +379,11 @@ const LightsoulsPage = () => {
                           : handleRestart
                       }
                       className="w-full sm:w-auto px-6 py-3 mt-2 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
+                      aria-label={
+                        selectedChoice.isCorrect
+                          ? "Continue to next round"
+                          : "Restart game"
+                      }
                     >
                       {selectedChoice.isCorrect ? "Continue" : "Restart"}
                     </button>
@@ -401,6 +411,7 @@ const LightsoulsPage = () => {
               <button
                 onClick={resetGame}
                 className="px-6 py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
+                aria-label="Start a new game"
               >
                 Play Again
               </button>

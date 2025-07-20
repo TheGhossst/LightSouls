@@ -30,12 +30,17 @@ export default function HomeOptions() {
           <Link
             href="/game"
             className="cursor-pointer group/tag transition-all duration-300 ease-out hover:scale-105"
+            aria-label="Start new game"
+            role="button"
           >
-            <div className="flex items-center px-12 py-3 rounded-xl bg-pulse">
+            <div
+              className="flex items-center px-12 py-3 rounded-xl bg-pulse"
+              aria-hidden="true"
+            >
               <h2 className="text-xl font-medium text-gray-300 group-hover/tag:text-white transition-colors duration-300">
                 Play Game
               </h2>
-              <Play className="ml-2 text-white" />
+              <Play className="ml-2 text-white" aria-hidden="true" />
             </div>
           </Link>
         </div>

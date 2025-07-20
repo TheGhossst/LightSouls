@@ -50,8 +50,16 @@ const BackgroundMusicPlayer: React.FC<BackgroundMusicPlayerProps> = ({
     <button
       onClick={toggleMute}
       className={`px-4 py-2 text-sm rounded bg-gray-900 text-white hover:bg-gray-700 ${className}`}
+      aria-label={`Background music - ${
+        isMuted ? "currently muted" : "currently playing"
+      }`}
+      aria-pressed={!isMuted}
     >
-      {isMuted ? <VolumeOff color="grey" /> : <Volume1 />}
+      {isMuted ? (
+        <VolumeOff color="grey" aria-hidden="true" />
+      ) : (
+        <Volume1 aria-hidden="true" />
+      )}
     </button>
   );
 };

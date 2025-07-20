@@ -237,21 +237,35 @@ const BossPage = () => {
           <GameHeader />
         </div>
         <div className="flex-shrink-0 mb-4 sm:mb-6">
-          <div className="flex justify-between items-center">
+          <div
+            className="flex justify-between items-center"
+            aria-label="Turn count"
+          >
             <span className="text-xs sm:text-sm text-zinc-400 font-mono">
               Turn
             </span>
-            <span className="text-xs sm:text-sm text-white font-mono">
+            <span
+              className="text-xs sm:text-sm text-white font-mono"
+              aria-label={`Current turn is ${turn}`}
+            >
               {turn}
             </span>
           </div>
         </div>
+
         <div className="flex-1 flex flex-col min-h-0">
           {!gameOver ? (
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 min-h-0 mb-4 sm:mb-6">
-                <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4 sm:p-6 h-full flex flex-col">
-                  <div className="flex-1 min-h-0 overflow-y-auto">
+                <div
+                  className="bg-zinc-900 border border-zinc-700 rounded-lg p-4 sm:p-6 h-full flex flex-col"
+                  role="region"
+                  aria-label="Game narration and choices"
+                >
+                  <div
+                    className="flex-1 min-h-0 overflow-y-auto"
+                    aria-live="polite"
+                  >
                     <TypewriterText
                       text={currentStory}
                       onStart={() => setIsWriting(true)}
@@ -261,33 +275,58 @@ const BossPage = () => {
                     />
                   </div>
 
-                  <div className="flex-shrink-0 mt-4 space-y-2">
+                  <div
+                    className="flex-shrink-0 mt-4 space-y-2"
+                    role="region"
+                    aria-label="Health indicators"
+                  >
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-xs sm:text-sm text-zinc-400">
                           Your Health
                         </span>
-                        <span className="text-xs sm:text-sm text-white">
+                        <span
+                          className="text-xs sm:text-sm text-white"
+                          aria-label={`Player health is ${playerHealth} out of 100`}
+                        >
                           {playerHealth}/100
                         </span>
                       </div>
-                      <div className="w-full bg-zinc-800 rounded-sm h-2">
+                      <div
+                        className="w-full bg-zinc-800 rounded-sm h-2"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={playerHealth}
+                        aria-label="Player health bar"
+                      >
                         <div
                           className="h-full bg-green-500 rounded-sm transition-all duration-300"
                           style={{ width: `${(playerHealth / 100) * 100}%` }}
                         />
                       </div>
                     </div>
+
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-xs sm:text-sm text-zinc-400">
                           Boss Health
                         </span>
-                        <span className="text-xs sm:text-sm text-white">
+                        <span
+                          className="text-xs sm:text-sm text-white"
+                          aria-label={`Boss health is ${bossHealth} out of 150`}
+                        >
                           {bossHealth}/150
                         </span>
                       </div>
-                      <div className="w-full bg-zinc-800 rounded-sm h-2">
+                      <div
+                        className="w-full bg-zinc-800 rounded-sm h-2"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={150}
+                        aria-valuenow={bossHealth}
+                        aria-label="Boss health bar"
+                      >
                         <div
                           className="h-full bg-red-500 rounded-sm transition-all duration-300"
                           style={{ width: `${(bossHealth / 150) * 100}%` }}
@@ -295,6 +334,7 @@ const BossPage = () => {
                       </div>
                     </div>
                   </div>
+
                   <div className="flex-shrink-0 mt-4">
                     <SpeechButton
                       text={currentStory}
@@ -310,7 +350,11 @@ const BossPage = () => {
               </div>
 
               <div className="flex-shrink-0">
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div
+                  className="grid grid-cols-2 gap-2 sm:gap-3"
+                  role="group"
+                  aria-label="Action choices"
+                >
                   {choices.map((choice, idx) => (
                     <button
                       key={idx}
@@ -329,7 +373,7 @@ const BossPage = () => {
                           ? "bg-zinc-900 opacity-50 cursor-not-allowed border-zinc-700"
                           : "bg-zinc-800 hover:bg-zinc-700 border-zinc-600 hover:border-zinc-500"
                       }`}
-                      aria-label={`Choose ${choice.text}`}
+                      aria-label={`Action button: ${choice.text}`}
                     >
                       {choice.text}
                     </button>
@@ -339,7 +383,11 @@ const BossPage = () => {
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8 max-w-sm mx-auto w-full text-center">
+              <div
+                className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 sm:p-8 max-w-sm mx-auto w-full text-center"
+                role="region"
+                aria-label="Game over message"
+              >
                 <h2 className="text-2xl sm:text-3xl font-mono font-bold mb-4 sm:mb-6">
                   {victory ? "Victory!" : "Defeat!"}
                 </h2>
@@ -351,6 +399,7 @@ const BossPage = () => {
                 <button
                   onClick={resetGame}
                   className="px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded text-sm sm:text-base lg:text-lg"
+                  aria-label="Restart the game"
                 >
                   Play Again
                 </button>

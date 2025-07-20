@@ -5,7 +5,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 export async function POST() {
   const prompt = `
-You are a game designer creating a dark fantasy, Souls-like RPG text adventure called "Lightsouls". The game lasts exactly 10 rounds. Each round presents the player with:
+You are a game designer creating a dark fantasy, Souls-like RPG text adventure called "Lightsouls". The game lasts exactly 5 rounds. Each round presents the player with:
 - A short narrative story (2–3 sentences),
 - Two choices, one of which leads to the next round and one which ends the game.
 
@@ -14,11 +14,11 @@ The world is cursed, bleak, and rich in cryptic lore.
 Only ONE choice should be correct. Randomize which one is correct each time.
 Provide an effect for both outcomes that expands the world or deepens the mystery.
 
-Generate the entire game in one go: backstory and all 10 rounds.
+Generate the entire game in one go: backstory and all 5 rounds.
 The story should be coherent, assuming the player always chooses the correct choice to progress.
 Start with a BACKSTORY to introduce the setting. Keep it mysterious, poetic, and less than 5 sentences.
 
-Then, for each round 1 to 10, generate the story and choices.
+Then, for each round 1 to 5, generate the story and choices.
 
 Now return ONLY a JSON object in this format:
 
@@ -35,7 +35,7 @@ Now return ONLY a JSON object in this format:
       "choice2effect": "string",
       "choice2isCorrect": boolean
     },
-    ... (for rounds 2 to 10)
+    ... (for rounds 2 to 5)
   ]
 }
 `;

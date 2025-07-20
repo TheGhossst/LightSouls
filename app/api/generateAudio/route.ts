@@ -14,7 +14,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
     const token = await tokenRes.json();
 
-    console.log(token);
+   // console.log(token);
 
     const ttsResponse = await fetch(
       "https://api.sws.speechify.com/v1/audio/stream",
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!ttsResponse.body) {
       return new Response("No audio stream received.", { status: 500 });
     }
-    console.log(ttsResponse);
+    // console.log(ttsResponse);
 
     const webReadableStream: ReadableStream<Uint8Array> = ttsResponse.body;
     const nodeReadable = Readable.from(

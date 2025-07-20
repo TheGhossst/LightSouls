@@ -5,6 +5,7 @@ import GameHeader from "./components/GameHeader";
 import GameLoading from "./components/GameLoading";
 import SpeechButton from "./components/SpeechButton";
 import TypewriterText from "./components/TypewriterText";
+import { useRouter } from "next/navigation";
 
 interface Choice {
   text: string;
@@ -58,6 +59,7 @@ const LightsoulsPage = () => {
     null
   );
   const [isWriting, setIsWriting] = useState(false);
+  const router = useRouter();
 
   const fetchGameData = useCallback(async () => {
     setLoading(true);
@@ -111,8 +113,12 @@ const LightsoulsPage = () => {
   const handleNextRound = () => {
     handleSpeechCancel();
     const nextRound = round + 1;
-    setRound(nextRound);
-    loadRound(nextRound);
+    if (nextRound > 5) {
+      router.push("/boss");
+    } else {
+      setRound(nextRound);
+      loadRound(nextRound);
+    }
   };
 
   const handleRestart = () => {
@@ -225,12 +231,12 @@ const LightsoulsPage = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm text-zinc-400 font-mono">Round</span>
-              <span className="text-sm text-white font-mono">{round}/10</span>
+              <span className="text-sm text-white font-mono">{round}/5</span>
             </div>
             <div className="w-full bg-zinc-800 rounded-sm h-1">
               <div
                 className="h-full bg-white transition-all duration-500 ease-out rounded-sm"
-                style={{ width: `${(round / 10) * 100}%` }}
+                style={{ width: `${(round / 5) * 100}%` }}
               />
             </div>
           </div>

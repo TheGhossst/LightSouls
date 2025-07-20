@@ -98,6 +98,16 @@ const LightsoulsPage = () => {
     loadRound(1);
   };
 
+  const handleNextRound = () => {
+    const nextRound = round + 1;
+    setRound(nextRound);
+    loadRound(nextRound);
+  };
+
+  const handleRestart = () => {
+    setGameOver(true);
+  };
+
   const handleChoice = (choice: Choice) => {
     setSelectedChoice(choice);
     setSelectedReason(choice.reason);
@@ -105,19 +115,18 @@ const LightsoulsPage = () => {
     const newHistoryEntry = { choice: choice.text, reason: choice.reason };
     const newHistory = [...history, newHistoryEntry];
     setHistory(newHistory);
-
-    if (!choice.isCorrect) {
-      setTimeout(() => setGameOver(true), 5000);
-    } else if (round >= 10) {
-      setTimeout(() => setGameOver(true), 3000);
-    } else {
-      setTimeout(() => {
-        const nextRound = round + 1;
-        setRound(nextRound);
-        loadRound(nextRound);
-      }, 5000);
-    }
   };
+
+  function handleSpeech() {
+    const speech = new SpeechSynthesisUtterance();
+    console.log("Speaking:", roundData?.story);
+    console.log(window.speechSynthesis);
+    speech.text = roundData?.story || "";
+    speech.volume = 1;
+    speech.rate = 1;
+    speech.pitch = 1;
+    window.speechSynthesis.speak(speech);
+  }
 
   const resetGame = () => {
     setRound(0);
@@ -195,6 +204,12 @@ const LightsoulsPage = () => {
               <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
                 {roundData.story}
               </p>
+              <button
+                onClick={handleSpeech}
+                className="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded"
+              >
+                Speak
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -243,6 +258,16 @@ const LightsoulsPage = () => {
                     <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
                       {selectedReason}
                     </p>
+                    <button
+                      onClick={
+                        selectedChoice.isCorrect
+                          ? handleNextRound
+                          : handleRestart
+                      }
+                      className="w-full sm:w-auto px-6 py-3 mt-2 bg-white text-black font-mono hover:bg-zinc-200 transition-colors rounded"
+                    >
+                      {selectedChoice.isCorrect ? "Continue" : "Restart"}
+                    </button>
                   </div>
                 </div>
               </div>

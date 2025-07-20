@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import BackgroundMusicPlayer from "./BackgroundMusicButton";
 
 export default function HomeHeader() {
   return (
@@ -9,6 +10,7 @@ export default function HomeHeader() {
         <Sparkles className="w-4 h-4" />
         <span>Perfectly Accessible</span>
       </div>
+      <BackgroundMusicPlayer src="/mainbgm.mp3" />
     </header>
   );
 }

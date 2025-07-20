@@ -1,40 +1,49 @@
 import React, { useState } from "react";
 
 const BOX_SIZE = 400;
-const CIRCLE_SIZE = 50;
+const SOUL_SIZE = 50;
 
 const getRandomPosition = () => {
-  const max = BOX_SIZE - CIRCLE_SIZE;
+  const max = BOX_SIZE - SOUL_SIZE;
   const x = Math.floor(Math.random() * max);
   const y = Math.floor(Math.random() * max);
   return { x, y };
 };
 
-const ClickCircleGame: React.FC = () => {
+const ClickSoulGame: React.FC = () => {
   const [score, setScore] = useState(0);
   const [position, setPosition] = useState(getRandomPosition());
 
-  const handleCircleClick = () => {
+  const handleSoulClick = () => {
     setScore((prev) => prev + 1);
     setPosition(getRandomPosition());
   };
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <h2 className="text-xl font-mono text-zinc-300">Score: {score}</h2>
+      <h2 className="text-xl font-mono text-zinc-300">
+        Souls Collected: {score}
+      </h2>
 
       <div
-        className="relative border-4 border-zinc-700 rounded-lg bg-zinc-900"
-        style={{ width: BOX_SIZE, height: BOX_SIZE }}
+        className="relative rounded-lg"
+        style={{
+          width: BOX_SIZE,
+          height: BOX_SIZE,
+          background: "radial-gradient(circle at center, #0f0f0f, #000000)",
+        }}
       >
         <div
-          onClick={handleCircleClick}
-          className="absolute bg-zinc-500 hover:bg-zinc-400 rounded-full cursor-pointer transition-all duration-150"
+          onClick={handleSoulClick}
+          className="absolute rounded-full cursor-pointer shadow-lg transition-all duration-150"
           style={{
-            width: CIRCLE_SIZE,
-            height: CIRCLE_SIZE,
+            width: SOUL_SIZE,
+            height: SOUL_SIZE,
             left: position.x,
             top: position.y,
+            background:
+              "radial-gradient(circle, #fff 0%, #ccc 60%, #0000 100%)",
+            boxShadow: "0 0 12px 6px rgba(255, 255, 255, 0.5)",
           }}
         />
       </div>
@@ -42,4 +51,4 @@ const ClickCircleGame: React.FC = () => {
   );
 };
 
-export default ClickCircleGame;
+export default ClickSoulGame;

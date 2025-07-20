@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import GameHeader from "./components/GameHeader";
 import GameLoading from "./components/GameLoading";
+import SpeechButton from "./components/SpeechButton";
 
 interface Choice {
   text: string;
@@ -48,6 +49,13 @@ const LightsoulsPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [shuffledChoices, setShuffledChoices] = useState<Choice[]>([]);
+  const [speechState, setSpeechState] = useState<
+    "idle" | "generating" | "playing" | "paused"
+  >("idle");
+  const [currentText, setCurrentText] = useState<string | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
+    null
+  );
 
   const fetchGameData = useCallback(async () => {
     setLoading(true);
@@ -56,7 +64,6 @@ const LightsoulsPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-
       const data = await res.json();
       setGameData(data);
     } catch (err) {
@@ -93,42 +100,26 @@ const LightsoulsPage = () => {
   };
 
   const handleStartJourney = () => {
+    handleSpeechCancel();
     setStarted(true);
     setRound(1);
     loadRound(1);
   };
 
   const handleNextRound = () => {
+    handleSpeechCancel();
     const nextRound = round + 1;
     setRound(nextRound);
     loadRound(nextRound);
   };
 
   const handleRestart = () => {
+    handleSpeechCancel();
     setGameOver(true);
   };
 
-  const handleChoice = (choice: Choice) => {
-    setSelectedChoice(choice);
-    setSelectedReason(choice.reason);
-
-    const newHistoryEntry = { choice: choice.text, reason: choice.reason };
-    const newHistory = [...history, newHistoryEntry];
-    setHistory(newHistory);
-  };
-
-  function handleSpeech() {
-    const speech = new SpeechSynthesisUtterance();
-    console.log("Speaking:", roundData?.story);
-    console.log(window.speechSynthesis);
-    speech.text = roundData?.story || "";
-    speech.volume = 1;
-    speech.rate = 1;
-    speech.pitch = 1;
-    window.speechSynthesis.speak(speech);
-  }
-
   const resetGame = () => {
+    handleSpeechCancel();
     setRound(0);
     setHistory([]);
     setRoundData(null);
@@ -140,6 +131,72 @@ const LightsoulsPage = () => {
     setShuffledChoices([]);
     fetchGameData();
   };
+
+  const handleChoice = (choice: Choice) => {
+    setSelectedChoice(choice);
+    setSelectedReason(choice.reason);
+    const newHistoryEntry = { choice: choice.text, reason: choice.reason };
+    const newHistory = [...history, newHistoryEntry];
+    setHistory(newHistory);
+  };
+
+  async function handleSpeechStart(text: string) {
+    if (speechState !== "idle" && currentText !== text) {
+      handleSpeechCancel();
+    }
+    setSpeechState("generating");
+    setCurrentText(text);
+    try {
+      const res = await fetch("/api/generateAudio", {
+        method: "POST",
+        body: text,
+      });
+      if (!res.ok) throw new Error("Failed to fetch audio");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      setCurrentAudio(audio);
+      audio.play();
+      setSpeechState("playing");
+
+      audio.onended = () => {
+        setSpeechState("idle");
+        setCurrentText(null);
+        setCurrentAudio(null);
+      };
+      audio.onpause = () => {
+        if (!audio.ended) setSpeechState("paused");
+      };
+      audio.onplay = () => setSpeechState("playing");
+    } catch (err) {
+      console.error("Speech error:", err);
+      setSpeechState("idle");
+      setCurrentText(null);
+    }
+  }
+
+  function handleSpeechPause() {
+    if (currentAudio && speechState === "playing") {
+      currentAudio.pause();
+    }
+  }
+
+  function handleSpeechResume() {
+    if (currentAudio && speechState === "paused") {
+      currentAudio.play();
+    }
+  }
+
+  function handleSpeechCancel() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+    }
+    setSpeechState("idle");
+    setCurrentText(null);
+  }
 
   useEffect(() => {
     fetchGameData();
@@ -187,6 +244,15 @@ const LightsoulsPage = () => {
                 <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
                   {gameData.backstory}
                 </p>
+                <SpeechButton
+                  text={gameData.backstory}
+                  speechState={speechState}
+                  currentText={currentText}
+                  onStart={handleSpeechStart}
+                  onPause={handleSpeechPause}
+                  onResume={handleSpeechResume}
+                  onCancel={handleSpeechCancel}
+                />
               </div>
               <button
                 onClick={handleStartJourney}
@@ -204,26 +270,40 @@ const LightsoulsPage = () => {
               <p className="text-zinc-300 leading-relaxed text-base italic sm:text-lg">
                 {roundData.story}
               </p>
-              <button
-                onClick={handleSpeech}
-                className="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded"
-              >
-                Speak
-              </button>
+              <SpeechButton
+                text={roundData.story}
+                speechState={speechState}
+                currentText={currentText}
+                onStart={handleSpeechStart}
+                onPause={handleSpeechPause}
+                onResume={handleSpeechResume}
+                onCancel={handleSpeechCancel}
+              />
             </div>
 
             <div className="space-y-4">
               {shuffledChoices.map((choice, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleChoice(choice)}
-                  disabled={!!selectedChoice}
-                  className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
-                    choice
-                  )}`}
-                >
-                  {choice.text}
-                </button>
+                <div key={`${idx}div`}>
+                  <button
+                    key={idx}
+                    onClick={() => handleChoice(choice)}
+                    disabled={!!selectedChoice}
+                    className={`w-full px-4 py-3 rounded-lg text-left transition border ${getChoiceButtonStyle(
+                      choice
+                    )}`}
+                  >
+                    {choice.text}
+                  </button>
+                  <SpeechButton
+                    text={choice.text}
+                    speechState={speechState}
+                    currentText={currentText}
+                    onStart={handleSpeechStart}
+                    onPause={handleSpeechPause}
+                    onResume={handleSpeechResume}
+                    onCancel={handleSpeechCancel}
+                  />
+                </div>
               ))}
             </div>
 
@@ -258,6 +338,15 @@ const LightsoulsPage = () => {
                     <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
                       {selectedReason}
                     </p>
+                    <SpeechButton
+                      text={selectedReason}
+                      speechState={speechState}
+                      currentText={currentText}
+                      onStart={handleSpeechStart}
+                      onPause={handleSpeechPause}
+                      onResume={handleSpeechResume}
+                      onCancel={handleSpeechCancel}
+                    />
                     <button
                       onClick={
                         selectedChoice.isCorrect
